@@ -11,10 +11,12 @@
   <body>
   	<!--messages get appended to ul, id="messages" below-->
 	<div class="col-md-9">
-	    <div class = "panel panel-default">
-	    	<div class = "panel-heading">Panel heading</div>
-	    	<div class = "panel-body">
-	    		<ul class = "list-group" id="messages"></ul>
+	    <div class = "panel panel-success">
+	    	<div class = "panel-heading">
+	    		<h4><span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;&nbsp;Chat</h4>
+	    	</div>
+	    	<div id = "chatBody" class = "panel-body">
+	    		<ul class = "media-list" id="messages" style="height: 300px; overflow: auto"></ul>
 	    	</div>
 			<div class = "panel-footer">
 				<form id="chatSubmit" action = "">	
@@ -26,24 +28,27 @@
 		  			</div>
 		  		<form>
 			</div>	    
-	    <!--messags get appended to ul above-->
-	    	<!--<form action="">
-	      		<input id="m" autocomplete="off" /><button>Send</button>
-	    	</form>-->
+	    <!--messages get appended to ul above-->
 		</div>
 	</div>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      var socket = io();
-      $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        return false;
-      });
-      socket.on('chat message', function(msg){
-        $('#messages').append($('<li class="list-group-item">').text(msg));
-      });
+	    var socket = io();
+	    $('form').submit(function(){
+	        socket.emit('chat message', $('#m').val());
+	        $('#m').val('');
+	        return false;
+	    });
+	    //scrollToBottom finds the zeroth element of the chat (media-list) and sets scroll to that element
+	    function scrollToBottom(){
+	        $('.media-list').scrollTop($('.media-list')[0].scrollHeight);
+        };
+        //scrollToBottom is called every time a <li> is appended
+	    socket.on('chat message', function(msg){
+	        $('#messages').append($('<li class="list-group-item">').text(msg));
+	        scrollToBottom();
+	    });
     </script>
   </body>
 </html>
