@@ -1,36 +1,72 @@
 <!DOCTYPE html>
 <html>
-  <head>
+  	<head>
     <title>Socket.IO chat</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      #messages li:nth-child(odd) { background: #eee; }
+    	* { margin: 0; padding: 0; box-sizing: border-box; }
+      	#messages li:nth-child(odd) { background: #eee; }
     </style>
-  </head>
-  <body>
-  	<!--messages get appended to ul, id="messages" below-->
-	<div class="col-md-9">
-	    <div class = "panel panel-success">
-	    	<div class = "panel-heading">
-	    		<h4><span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;&nbsp;Chat</h4>
-	    	</div>
-	    	<div id = "chatBody" class = "panel-body">
-	    		<ul class = "media-list" id="messages" style="height: 300px; overflow: auto"></ul>
-	    	</div>
-			<div class = "panel-footer">
-				<form id="chatSubmit" action = "">	
-					<div class = "input-group">
-						<input type="text" class="form-control" placeholder="enter text here" aria-describedby="basic-addon2" id="m" autocomplete="off" />
-		  				<span class="input-group-btn" id="basic-addon2">
-		  					<button class="btn btn-default" type="submit">SEND</button>
-		  				</span>
-		  			</div>
-		  		<form>
-			</div>	    
-	    <!--messages get appended to ul above-->
+  	</head>
+ 	 <body>
+ 	 	<div id = "container">
+ 	 		<h2 class = "text-center">socket.io chat&nbsp;&nbsp;<small><span class="glyphicon glyphicon-comment"</small></h2>
+ 	 		<!--begin nicknameGrabber-->
+ 	 		<div id = "nicknameGrabber">
+	 	 			<!--<span class="glyphicon glyphicon-hand-right"></span>-->
+	 	 		<div class="col-md-8">
+						<input type="text" class="form-control" id="username" placeholder="Enter username" />
+				</div>
+				<div class="col-md-3">
+					<form action="">
+						<button class="btn btn-success" autocomplete="off" type="submit">Save username</button>
+					</form>
+				</div>
+ 	 		</div>
+ 	 		<!--end nicknameGrabber-->
+
+		  	<!--begin chatzone-->
+			<div class="col-md-8">
+			    <div class = "panel panel-success">
+			    	<div class = "panel-heading">
+			    		<h4><span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;&nbsp;Chat</h4>
+			    	</div>
+			    	<div id = "chatBody" class = "panel-body">
+			    		<!--messages get appended to ul, id="messages" below-->
+			    		<ul class = "media-list" id="messages" style="height: 300px; overflow: auto"></ul>
+			    		<!--messages get appended to ul above-->
+			    	</div>
+					<div class = "panel-footer">
+						<form id="chatSubmit" action = "">	
+							<div class = "input-group">
+								<input type="text" class="form-control" placeholder="enter text here" aria-describedby="basic-addon2" id="m" autocomplete="off" />
+				  				<span class="input-group-btn" id="basic-addon2">
+				  					<button class="btn btn-default" type="submit">SEND</button>
+				  				</span>
+				  			</div>
+				  		<form>
+					</div>	    
+				</div>
+			</div>
+			<!--end chatzone-->
+
+			<!--begin active user list-->
+			<div class="col-md-4">
+				<div class = "panel panel-success">
+					<div class="panel-heading text-center">
+						<span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;USER LIST
+					</div>
+					<div class="panel-body">
+						<!---->
+						<ul class="media-list" id="userList" style="height: 300px; overflow: auto"></ul>
+						<!---->
+					</div>
+					<div class="panel-footer text-center">
+					</div>
+				</div>
+			</div>
+			<!--end active user list-->		
 		</div>
-	</div>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
