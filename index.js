@@ -2,6 +2,20 @@ var app = require('express')();
 //express initializes app to be a function handler that you can supply to an HTTP server
 var http = require('http').Server(app);
 var io = require("socket.io")(http);
+var arnoldPhrases = [
+  "I'll be back",
+  "Hasta la vista, baby",
+  "Consider that a divorce",
+  "It's not a tumor",
+  "Let off some steam, Bennett",
+  "Get to the chopper!",
+  "A freeze is coming",
+  "You want to be a farmer? Here's a couple of acres!",
+  "See you at the party, Richter!",
+  "Honey, you shouldn't drink and bake"
+];
+var nicknames = [];
+//nicknames wll hold the user list
 
 app.get("/", function(req,res){
 	res.sendFile(__dirname+"/index.html")
@@ -18,6 +32,26 @@ io.on('connection', function(socket){
 		console.log("user disconnected");
 	});
 });
+
+//shuffle will take an array and return the array with the elements randomly ordered, to be used by arnoldBot
+function shuffle(arr){
+  for(var i = arr.length -1; i > 0; i--){
+    var randomIndex = Math.floor(Math.random(i+1));
+    var temp = arr[randomIndex];
+    arr[randomIndex] = arr[i];
+    arr[i] = temp;
+  }
+  return arr;
+};
+
+//this is arnoldBot speaking every 10 seconds
+setInterval(function(){
+  var date = new Date();
+  date = date.toLocaleString('en-US');
+  var arnoldSpeak = shuffle(arnoldPhrases)[0];
+  console.log(date+" | arnoldBot: "+ arnoldSpeak);
+  io.emit("chat message", date+" | arnoldBot: "+ arnoldSpeak);
+},10000);
 
 
 http.listen(3000, function(){
