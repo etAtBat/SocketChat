@@ -9,7 +9,7 @@
       		background: #eee; 
       	}
       	#contentWrap {
-      		/*display: none;*/
+      		display: none;
       	}
     </style>
   	</head>
@@ -22,7 +22,7 @@
 						<input type="text" class="form-control" id="username" placeholder="Enter username" />
 				</div>
 				<div class="col-md-3">
-					<form action="" onsubmit = "return submitUsername();">
+					<form action="" id="submitUsername">
 						<button class="btn btn-success" autocomplete="off" type="submit">Save username</button>
 					</form>
 				</div>
@@ -77,26 +77,55 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
 	    var socket = io();
+	    var newUser = ">:(";
+	    var validNameFlag = 0;
+	    //validNameFlag is 0 while name is taken, 1 if username is free
+	    //messages appended while validNameFlag is 1
+	    //the flag ensures that messages are appended only when username is valid, not as soon as new connection to server
 
+	    //adding messages to the chat
 	    $('#chatSubmit').submit(function(){
 	        socket.emit('chat message', $('#m').val());
 	        $('#m').val('');
 	        return false;
 	    });
-	    //submitUsername takes the username and saves it and updates the User List
-	    function submitUsername(){
 
-	    	io.emit('username')
-
-	    };
 	    //scrollToBottom finds the zeroth element of the chat (media-list) and sets scroll to that element
 	    function scrollToBottom(){
-	        $('.media-list').scrollTop($('.media-list')[0].scrollHeight);
+	        $('#messages').scrollTop($('#messages')[0].scrollHeight);
         };
         //scrollToBottom is called every time a <li> is appended
 	    socket.on('chat message', function(msg){
-	        $('#messages').append($('<li class="list-group-item">').text(msg));
-	        scrollToBottom();
+	    	if(validNameFlag === 1){
+	        	$('#messages').append($('<li class="list-group-item">').text(msg));
+	        	scrollToBottom();
+	    	};
+	    });
+
+
+	    //grab value from username field and send it to the server where it will be checked for uniqueness
+	    $("#submitUsername").submit(function(){
+	    	newUser = $("#username").val();
+	    	alert(newUser);
+	    	socket.emit('new user', newUser, function(data){
+	    		if(data){
+	    			$("#nicknameGrabber").hide();
+	    			$("#contentWrap").show();
+	    			validNameFlag = 1;	    			
+	    		} else {
+	    			alert("username taken");
+	    		}
+	    	});
+	    	$("#username").val('');
+	    	return false;
+	    });
+
+	    socket.on('usernames', function(nameArr){
+	    	$('#userList').empty();
+	    	for(var i = 0; i < nameArr.length; i++){
+	    		$("#userList").append('<li class="list-group-item chatMessages">'+nameArr[i]+'</li>');
+	    	};
+
 	    });
     </script>
   </body>

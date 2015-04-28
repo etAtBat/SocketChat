@@ -23,12 +23,35 @@ app.get("/", function(req,res){
 //define route handler '/' that gets called when we hit our website home
 
 io.on('connection', function(socket){
-  	console.log("a user connected");
-  	socket.on('chat message', function(msg){
-    	io.emit('chat message', msg);
-    	console.log("message: " + msg);
-  	});
-  	socket.on('disconnect', function(){
+  console.log("a user connected");
+
+  function updateUsers(){
+    io.emit('usernames', nicknames)
+  };
+
+  socket.on('new user', function(data, callback){
+    if(nicknames.indexOf(data) != -1){
+      callback(false);
+    } else {
+      socket.nickname = data;
+      nicknames.push(data);
+      callback(true);
+      updateUsers();
+    }
+
+  });
+
+  socket.on('chat message', function(msg){
+    io.emit('chat message', msg);
+    console.log("message: " + msg);
+  });
+
+  socket.on('disconnect', function(){
+    if(!socket.nickname){
+      return;
+    }
+    nicknames.splice(nicknames.indexOf(socket.nickname), 1);
+    updateUsers();
 		console.log("user disconnected");
 	});
 });
