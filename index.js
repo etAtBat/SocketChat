@@ -14,7 +14,8 @@ var arnoldPhrases = [
   "See you at the party, Richter!",
   "Honey, you shouldn't drink and bake"
 ];
-var nicknames = [];
+var robotName = "arnoldBot";
+var nicknames = [robotName];
 //nicknames wll hold the user list
 
 app.get("/", function(req,res){
@@ -42,8 +43,11 @@ io.on('connection', function(socket){
   });
 
   socket.on('chat message', function(msg){
+    var date = new Date();
+    date = date.toLocaleString('en-US');
+    msg = date+" | "+socket.nickname+": "+ msg;
     io.emit('chat message', msg);
-    console.log("message: " + msg);
+    console.log(msg);
   });
 
   socket.on('disconnect', function(){
@@ -72,8 +76,8 @@ setInterval(function(){
   var date = new Date();
   date = date.toLocaleString('en-US');
   var arnoldSpeak = shuffle(arnoldPhrases)[0];
-  console.log(date+" | arnoldBot: "+ arnoldSpeak);
-  io.emit("chat message", date+" | arnoldBot: "+ arnoldSpeak);
+  console.log(date+" | "+robotName+": "+ arnoldSpeak);
+  io.emit("chat message", date+" | "+robotName+": "+ arnoldSpeak);
 },10000);
 
 
