@@ -13,7 +13,7 @@
       	}
     </style>
   	</head>
- 	 <body>
+ 	<body>
  	 	<div id = "container">
  	 		<h2 class = "text-center">socket.io chat&nbsp;&nbsp;<small><span class="glyphicon glyphicon-comment"</small></h2>
  	 		<!--begin nicknameGrabber-->
@@ -106,7 +106,6 @@
 	    //grab value from username field and send it to the server where it will be checked for uniqueness
 	    $("#submitUsername").submit(function(){
 	    	newUser = $("#username").val();
-	    	alert(newUser);
 	    	socket.emit('new user', newUser, function(data){
 	    		if(data){
 	    			$("#nicknameGrabber").hide();
@@ -128,5 +127,5 @@
 
 	    });
     </script>
-  </body>
+	</body>
 </html>
