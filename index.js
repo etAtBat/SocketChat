@@ -38,7 +38,7 @@ io.on('connection', function(socket){
       nicknames.push(data);
       callback(true);
       updateUsers();
-      io.emit('chat message', socket.nickname + " has entered the chat");
+      io.emit('enterExit', "  " + socket.nickname + " has entered the chat");
     }
 
   });
@@ -57,7 +57,7 @@ io.on('connection', function(socket){
     }
     nicknames.splice(nicknames.indexOf(socket.nickname), 1);
     updateUsers();
-    io.emit('chat message', socket.nickname + " has left the chat");
+    io.emit('enterExit', "  " + socket.nickname + " has left the chat");
 		console.log("user disconnected");
 	});
 });

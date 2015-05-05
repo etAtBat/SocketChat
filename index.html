@@ -11,6 +11,15 @@
       	#contentWrap {
       		display: none;
       	}
+      	#nicknameTaken{
+      		display: none;
+      	}
+      	#enterExit{
+      		white-space: pre;
+      	}
+      	#offlineIcon{
+      		color:red;
+      	}
     </style>
   	</head>
  	<body>
@@ -26,6 +35,9 @@
 						<button class="btn btn-success" autocomplete="off" type="submit">Save username</button>
 					</form>
 				</div>
+ 	 		</div>
+ 	 		<div class = "col-md-6" id = "nicknameTaken">
+ 	 			<h4><span id = "offlineIcon" class = "glyphicon glyphicon-remove-circle"></span>&nbsp;&nbsp;username taken<h4>
  	 		</div>
  	 		<!--end nicknameGrabber-->
 
@@ -102,6 +114,14 @@
 	    	};
 	    });
 
+	    //enterExit each time user connects/disconnects
+	    socket.on('enterExit', function(msg){
+	    	if(validNameFlag === 1){
+	        	$('#messages').append($('<li id = "enterExit" class="list-group-item">').text(msg));
+	        	scrollToBottom();
+	    	};
+	    });
+
 
 	    //grab value from username field and send it to the server where it will be checked for uniqueness
 	    $("#submitUsername").submit(function(){
@@ -110,9 +130,10 @@
 	    		if(data){
 	    			$("#nicknameGrabber").hide();
 	    			$("#contentWrap").show();
-	    			validNameFlag = 1;	    			
+	    			$("#nicknameTaken").hide();
+	    			validNameFlag = 1; 			
 	    		} else {
-	    			alert("username taken");
+	    			$("#nicknameTaken").fadeIn(450);
 	    		}
 	    	});
 	    	$("#username").val('');
