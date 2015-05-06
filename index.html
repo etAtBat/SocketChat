@@ -8,11 +8,17 @@
       	#messages li:nth-child(odd) { 
       		background: #eee; 
       	}
+      	#messages{
+      		word-wrap: break-word;
+      	}
       	#contentWrap {
       		display: none;
       	}
       	#nicknameTaken{
       		display: none;
+      	}
+      	#userList{
+      		word-wrap: break-word;
       	}
       	#enterExit{
       		white-space: pre;
@@ -97,10 +103,10 @@
 
 	    //adding messages to the chat
 	    $('#chatSubmit').submit(function(){
-	        socket.emit('chat message', $('#m').val());
-	        $('#m').val('');
-	        return false;
-	    });
+            socket.emit('chat message', $('#m').val());
+		    $('#m').val('');
+		    return false;
+		});
 
 	    //scrollToBottom finds the zeroth element of the chat (media-list) and sets scroll to that element
 	    function scrollToBottom(){

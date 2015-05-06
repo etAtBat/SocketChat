@@ -16,7 +16,7 @@ var arnoldPhrases = [
 ];
 var robotName = "arnoldBot";
 var nicknames = [robotName];
-//nicknames wll hold the user list
+//nicknames will hold the user list
 
 app.get("/", function(req,res){
 	res.sendFile(__dirname+"/index.html")
