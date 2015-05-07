@@ -15,8 +15,9 @@ var arnoldPhrases = [
   "Honey, you shouldn't drink and bake"
 ];
 var robotName = "arnoldBot";
-var nicknames = [robotName];
-//nicknames will hold the user list
+var users = {};
+//users will hold the list of active users
+users[robotName] = "";
 
 app.get("/", function(req,res){
 	res.sendFile(__dirname+"/index.html")
@@ -27,15 +28,15 @@ io.on('connection', function(socket){
   console.log("a user connected");
 
   function updateUsers(){
-    io.emit('usernames', nicknames)
+    io.emit('usernames', Object.keys(users));
   };
 
   socket.on('new user', function(data, callback){
-    if(nicknames.indexOf(data) != -1){
+    if(data in users){
       callback(false);
     } else {
       socket.nickname = data;
-      nicknames.push(data);
+      users[socket.nickname] = socket;
       callback(true);
       updateUsers();
       io.emit('enterExit', "  " + socket.nickname + " has entered the chat");
@@ -55,7 +56,7 @@ io.on('connection', function(socket){
     if(!socket.nickname){
       return;
     }
-    nicknames.splice(nicknames.indexOf(socket.nickname), 1);
+    delete users[socket.nickname];
     updateUsers();
     io.emit('enterExit', "  " + socket.nickname + " has left the chat");
 		console.log("user disconnected");
