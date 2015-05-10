@@ -48,14 +48,20 @@ io.on('connection', function(socket){
     var date = new Date();
     date = date.toLocaleString('en-US');
     var msg = msg.trim();
-    if(msg.substr(0,3) === '/w '){
+    if(msg.substr(0,3) === '/w ' || msg.substr(0,2) === '/w'){
       msg = msg.substr(3);
       var firstSpace = msg.indexOf(' ');
       if(firstSpace !== -1){
         //check to see username is valid
         var isValidName  = msg.substr(0, firstSpace);
         msg = msg.substr(firstSpace + 1);
-        if(isValidName in users){
+        //add patch in case somebody is trying to whisper to the chatBot
+        if(isValidName == robotName){
+          var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
+          var fromRobot = date+" | from "+robotName+": hi "+ socket.nickname + " beep boop beep I'm a robot";
+          users[socket.nickname].emit('new whisper', messageFromWhisperer);
+          users[socket.nickname].emit('new whisper', fromRobot)
+        }else if(isValidName in users){
           var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
           msg = date+" | from "+socket.nickname+": "+ msg;
           users[isValidName].emit('new whisper', msg);
