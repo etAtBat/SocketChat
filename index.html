@@ -26,6 +26,13 @@
       	#offlineIcon{
       		color:red;
       	}
+      	#whispering{
+      		color: gray;
+      		font-style: italic;
+      	}
+      	#error{
+      		color: red;
+      	}
     </style>
   	</head>
  	<body>
@@ -101,9 +108,12 @@
 	    //messages appended while validNameFlag is 1
 	    //the flag ensures that messages are appended only when username is valid, not as soon as new connection to server
 
-	    //adding messages to the chat
+	    //sending message to the server
 	    $('#chatSubmit').submit(function(){
-            socket.emit('chat message', $('#m').val());
+            socket.emit('chat message', $('#m').val(), function(data){
+            	$('#messages').append($('<li id = "error" class="list-group-item">').text(data));
+            	scrollToBottom();
+            });
 		    $('#m').val('');
 		    return false;
 		});
@@ -128,10 +138,23 @@
 	    	};
 	    });
 
+	    //new whisper will handle whispers between users
+	    socket.on('new whisper', function(msg){
+	    	if(validNameFlag === 1){
+	        	$('#messages').append($('<li id = "whispering" class="list-group-item">').text(msg));
+	        	scrollToBottom();
+	    	};
+	    });
+
 
 	    //grab value from username field and send it to the server where it will be checked for uniqueness
 	    $("#submitUsername").submit(function(){
 	    	newUser = $("#username").val();
+	    	if(newUser.indexOf(' ') !== -1){
+	    		var replaceAllSpaces = newUser.split(' ');
+	    		newUser = replaceAllSpaces.join('_');
+	    		//this replaces all spaces with underscores as whispering will look for the first space	
+	    	}
 	    	socket.emit('new user', newUser, function(data){
 	    		if(data){
 	    			$("#nicknameGrabber").hide();

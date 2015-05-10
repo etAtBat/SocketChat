@@ -44,12 +44,34 @@ io.on('connection', function(socket){
 
   });
 
-  socket.on('chat message', function(msg){
+  socket.on('chat message', function(msg, callback){
     var date = new Date();
     date = date.toLocaleString('en-US');
-    msg = date+" | "+socket.nickname+": "+ msg;
-    io.emit('chat message', msg);
-    console.log(msg);
+    var msg = msg.trim();
+    if(msg.substr(0,3) === '/w '){
+      msg = msg.substr(3);
+      var firstSpace = msg.indexOf(' ');
+      if(firstSpace !== -1){
+        //check to see username is valid
+        var isValidName  = msg.substr(0, firstSpace);
+        msg = msg.substr(firstSpace + 1);
+        if(isValidName in users){
+          var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
+          msg = date+" | from "+socket.nickname+": "+ msg;
+          users[isValidName].emit('new whisper', msg);
+          users[socket.nickname].emit('new whisper', messageFromWhisperer);
+          console.log('whisper');  
+        }else{
+          callback("Please enter a valid username");
+        }
+      }else{
+        callback("Please enter a message to whisper");
+      }
+    }else{
+      msg = date+" | "+socket.nickname+": "+ msg;
+      io.emit('chat message', msg);
+      console.log(msg);
+    }
   });
 
   socket.on('disconnect', function(){
