@@ -1,4 +1,7 @@
 # SocketChat
-socket io chat
+exploring socket.io
+get started building your own chat app: http://socket.io/get-started/chat/
 
-run using node index.js
+node index.js to get started
+
+whisper users old-fashioned style, using /w <username>
