@@ -55,12 +55,11 @@ io.on('connection', function(socket){
         //check to see username is valid
         var isValidName  = msg.substr(0, firstSpace);
         msg = msg.substr(firstSpace + 1);
-        //add patch in case somebody is trying to whisper to the chatBot
         if(isValidName == robotName){
           var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
-          var fromRobot = date+" | from "+robotName+": hi "+ socket.nickname + " beep boop beep I'm a robot";
+          var fromRobot = date+" | from "+robotName+": hi "+ socket.nickname + ", beep boop beep I'm a robot";
           users[socket.nickname].emit('new whisper', messageFromWhisperer);
-          users[socket.nickname].emit('new whisper', fromRobot)
+          users[socket.nickname].emit('new whisper', fromRobot);
         }else if(isValidName in users){
           var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
           msg = date+" | from "+socket.nickname+": "+ msg;

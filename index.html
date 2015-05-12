@@ -17,6 +17,12 @@
       	#nicknameTaken{
       		display: none;
       	}
+      	#noName{
+      		display: none;
+      	}
+      	#noSpaces{
+      		display: none;
+      	}
       	#userList{
       		word-wrap: break-word;
       	}
@@ -50,7 +56,13 @@
 				</div>
  	 		</div>
  	 		<div class = "col-md-6" id = "nicknameTaken">
- 	 			<h4><span id = "offlineIcon" class = "glyphicon glyphicon-remove-circle"></span>&nbsp;&nbsp;username taken<h4>
+ 	 			<h4><span id = "offlineIcon" class = "glyphicon glyphicon-remove-circle"></span>&nbsp;&nbsp;username taken</h4>
+ 	 		</div>
+ 	 		<div class = "col-md-6" id = "noName">
+ 	 			<h4><span id = "offlineIcon" class = "glyphicon glyphicon-remove-circle"></span>&nbsp;&nbsp;please enter a username</h4>
+ 	 		</div>
+ 	 		<div class = "col-md-6" id = "noSpaces">
+ 	 			<h4><span id = "offlineIcon" class = "glyphicon glyphicon-remove-circle"></span>&nbsp;&nbsp;please choose a username without spaces</h4>
  	 		</div>
  	 		<!--end nicknameGrabber-->
 
@@ -150,23 +162,38 @@
 	    //grab value from username field and send it to the server where it will be checked for uniqueness
 	    $("#submitUsername").submit(function(){
 	    	newUser = $("#username").val();
-	    	if(newUser.indexOf(' ') !== -1){
-	    		var replaceAllSpaces = newUser.split(' ');
-	    		newUser = replaceAllSpaces.join('_');
+	    	if(newUser == ""){
+	    		$("#noSpaces").hide();
+	    		$("#nicknameTaken").hide();
+	    		$("#noName").fadeIn(450);
+	    		$("#username").val('');
+	    		return false;
+	    	}else if(newUser.indexOf(' ') !== -1){
+	    		//this case when spaces detected
+	    		$("#noName").hide();
+	    		$("#nicknameTaken").hide();
+	    		$("#noSpaces").fadeIn(450);
+	    		$("#username").val('');
+	    		return false;
 	    		//this replaces all spaces with underscores as whispering will look for the first space	
-	    	}
-	    	socket.emit('new user', newUser, function(data){
-	    		if(data){
-	    			$("#nicknameGrabber").hide();
-	    			$("#contentWrap").show();
-	    			$("#nicknameTaken").hide();
-	    			validNameFlag = 1; 			
-	    		} else {
-	    			$("#nicknameTaken").fadeIn(450);
-	    		}
-	    	});
-	    	$("#username").val('');
-	    	return false;
+	    	}else{
+		    	socket.emit('new user', newUser, function(data){
+		    		if(data){
+		    			$("#noSpaces").hide();
+		    			$("#noName").hide();
+		    			$("#nicknameGrabber").hide();
+		    			$("#contentWrap").show();
+		    			$("#nicknameTaken").hide();
+		    			validNameFlag = 1; 			
+		    		} else {
+		    			$("#noSpaces").hide();
+		    			$("#noName").hide();
+		    			$("#nicknameTaken").fadeIn(450);
+		    		}
+		    	});
+		    	$("#username").val('');
+		    	return false;
+		    }
 	    });
 
 	    socket.on('usernames', function(nameArr){
