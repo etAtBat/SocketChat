@@ -29,6 +29,24 @@ io.on('connection', function(socket){
 
   function updateUsers(){
     io.emit('usernames', Object.keys(users));
+    //Object.keys returns an array
+  };
+
+  function each(something, doThis){
+    if(something === {} || something === []){
+      return undefined;
+    }else if(Array.isArray(something)){
+      for(var i = 0; i < something.length; i++){
+        doThis(something[i]);
+      };
+    }else{
+      //something is an object
+      for(var key in something){
+        if(something.hasOwnProperty(key)){
+          doThis(something[key]);
+        }
+      };
+    }
   };
 
   socket.on('new user', function(data, callback){
