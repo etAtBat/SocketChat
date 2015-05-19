@@ -16,8 +16,12 @@ var arnoldPhrases = [
 ];
 var robotName = "arnoldBot";
 var users = {};
+var usersJSON = [];
 //users will hold the list of active users
+var namePresent = false;
+//namePresent is false as long as the submitted username is valid, else true, to be used in name checking callback
 users[robotName] = "";
+usersJSON.push({"name":robotName});
 
 app.get("/", function(req,res){
 	res.sendFile(__dirname+"/index.html")
@@ -50,11 +54,20 @@ io.on('connection', function(socket){
   };
 
   socket.on('new user', function(data, callback){
-    if(data in users){
+    namePresent = false;
+    each(usersJSON, function(a){
+      if(a["name"] === data){
+        //one of the objects has the name (nickname submitted is taken)
+        namePresent = true;
+      }
+    });
+
+    if(namePresent){
       callback(false);
     } else {
       socket.nickname = data;
       users[socket.nickname] = socket;
+      usersJSON.push({"name":socket.nickname});
       callback(true);
       updateUsers();
       io.emit('enterExit', "  " + socket.nickname + " has entered the chat");

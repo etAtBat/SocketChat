@@ -175,15 +175,14 @@
 	    		$("#noSpaces").fadeIn(450);
 	    		$("#username").val('');
 	    		return false;
-	    		//this replaces all spaces with underscores as whispering will look for the first space	
 	    	}else{
 		    	socket.emit('new user', newUser, function(data){
 		    		if(data){
 		    			$("#noSpaces").hide();
 		    			$("#noName").hide();
 		    			$("#nicknameGrabber").hide();
-		    			$("#contentWrap").show();
 		    			$("#nicknameTaken").hide();
+		    			$("#contentWrap").show();
 		    			validNameFlag = 1; 			
 		    		} else {
 		    			$("#noSpaces").hide();
