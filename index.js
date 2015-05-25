@@ -55,6 +55,7 @@ io.on('connection', function(socket){
 
   socket.on('new user', function(data, callback){
     namePresent = false;
+
     each(usersJSON, function(a){
       if(a["name"] === data){
         //one of the objects has the name (nickname submitted is taken)
@@ -66,11 +67,17 @@ io.on('connection', function(socket){
       callback(false);
     } else {
       socket.nickname = data;
-      users[socket.nickname] = socket;
+      each(users, function(a){
+        if(data in users){
+          return;
+        }else{
+          users[socket.nickname] = socket;
+        }
+      });
       usersJSON.push({"name":socket.nickname});
       callback(true);
       updateUsers();
-      io.emit('enterExit', "  " + socket.nickname + " has entered the chat");
+      io.emit('enterExit', "  " + data + " has entered the chat");
     }
 
   });
