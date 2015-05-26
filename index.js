@@ -74,7 +74,9 @@ io.on('connection', function(socket){
           users[socket.nickname] = socket;
         }
       });
-      usersJSON.push({"name":socket.nickname});
+      usersJSON.push({"name":socket.nickname,
+                      "lastMessage": undefined,
+                      "notSpam": true});
       callback(true);
       updateUsers();
       io.emit('enterExit', "  " + data + " has entered the chat");
@@ -84,36 +86,66 @@ io.on('connection', function(socket){
 
   socket.on('chat message', function(msg, callback){
     var date = new Date();
-    date = date.toLocaleString('en-US');
+    var notSpam = true;
     var msg = msg.trim();
-    if(msg.substr(0,3) === '/w ' || msg.substr(0,2) === '/w'){
-      msg = msg.substr(3);
-      var firstSpace = msg.indexOf(' ');
-      if(firstSpace !== -1){
-        //check to see username is valid
-        var isValidName  = msg.substr(0, firstSpace);
-        msg = msg.substr(firstSpace + 1);
-        if(isValidName == robotName){
-          var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
-          var fromRobot = date+" | from "+robotName+": hi "+ socket.nickname + ", beep boop beep I'm a robot";
-          users[socket.nickname].emit('new whisper', messageFromWhisperer);
-          users[socket.nickname].emit('new whisper', fromRobot);
-        }else if(isValidName in users){
-          var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
-          msg = date+" | from "+socket.nickname+": "+ msg;
-          users[isValidName].emit('new whisper', msg);
-          users[socket.nickname].emit('new whisper', messageFromWhisperer);
-          console.log('whisper');  
+
+    //the following checks to prevent users from spamming chat
+    each(usersJSON, function(a){
+      if(a["lastMessage"] === undefined){
+        a["lastMessage"] = date;
+      }else if((date - a["lastMessage"]) <= 1000){
+        //wait one tenth of a second between sending message, stops spam
+        users[socket.nickname].emit('no spam', "please do not spam the chat");
+        console.log("no spam");
+        a["notSpam"] = false;
+      }else{
+        a["lastMessage"] = date;
+        a["notSpam"] = true;
+      }
+    });
+
+    date = date.toLocaleString('en-US');
+
+    function getIndexUsingName(findThisName){
+      var indexOfObj = 0;
+      each(usersJSON, function(a){
+        if(a["name"] === findThisName){
+          indexOfObj = usersJSON.indexOf(a);
+        }
+      })
+      return indexOfObj;
+    };
+
+    if(usersJSON[getIndexUsingName(users[socket.nickname])]["notSpam"]){
+      if(msg.substr(0,3) === '/w ' || msg.substr(0,2) === '/w'){
+        msg = msg.substr(3);
+        var firstSpace = msg.indexOf(' ');
+        if(firstSpace !== -1){
+          //check to see username is valid
+          var isValidName  = msg.substr(0, firstSpace);
+          msg = msg.substr(firstSpace + 1);
+          if(isValidName == robotName){
+            var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
+            var fromRobot = date+" | from "+robotName+": hi "+ socket.nickname + ", beep boop beep I'm a robot";
+            users[socket.nickname].emit('new whisper', messageFromWhisperer);
+            users[socket.nickname].emit('new whisper', fromRobot);
+          }else if(isValidName in users){
+            var messageFromWhisperer = date+" | to "+isValidName+": "+ msg;
+            msg = date+" | from "+socket.nickname+": "+ msg;
+            users[isValidName].emit('new whisper', msg);
+            users[socket.nickname].emit('new whisper', messageFromWhisperer);
+            console.log('whisper');  
+          }else{
+            callback("Please enter a valid username");
+          }
         }else{
-          callback("Please enter a valid username");
+          callback("Please enter a message to whisper");
         }
       }else{
-        callback("Please enter a message to whisper");
+        msg = date+" | "+socket.nickname+": "+ msg;
+        io.emit('chat message', msg);
+        console.log(msg);
       }
-    }else{
-      msg = date+" | "+socket.nickname+": "+ msg;
-      io.emit('chat message', msg);
-      console.log(msg);
     }
   });
 
