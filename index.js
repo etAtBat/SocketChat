@@ -23,20 +23,17 @@ var namePresent = false;
 users[robotName] = "";
 usersJSON.push({"name":robotName});
 
-app.get("/", function(req,res){
-	res.sendFile(__dirname+"/index.html")
-});
-//define route handler '/' that gets called when we hit our website home
+function getIndexUsingName(findThisName){
+      var indexOfObj = -1;
+      each(usersJSON, function(a){
+        if(a["name"] === findThisName){
+          indexOfObj = usersJSON.indexOf(a);
+        }
+      })
+      return indexOfObj;
+    };
 
-io.on('connection', function(socket){
-  console.log("a user connected");
-
-  function updateUsers(){
-    io.emit('usernames', Object.keys(users));
-    //Object.keys returns an array
-  };
-
-  function each(something, doThis){
+function each(something, doThis){
     if(something === {} || something === []){
       return undefined;
     }else if(Array.isArray(something)){
@@ -51,6 +48,20 @@ io.on('connection', function(socket){
         }
       };
     }
+};
+
+
+app.get("/", function(req,res){
+	res.sendFile(__dirname+"/index.html")
+});
+//define route handler '/' that gets called when we hit our website home
+
+io.on('connection', function(socket){
+  console.log("a user connected");
+
+  function updateUsers(){
+    io.emit('usernames', Object.keys(users));
+    //Object.keys returns an array
   };
 
   socket.on('new user', function(data, callback){
@@ -93,10 +104,8 @@ io.on('connection', function(socket){
     each(usersJSON, function(a){
       if(a["lastMessage"] === undefined){
         a["lastMessage"] = date;
-      }else if((date - a["lastMessage"]) <= 1000){
-        //wait one tenth of a second between sending message, stops spam
-        users[socket.nickname].emit('no spam', "please do not spam the chat");
-        console.log("no spam");
+      }else if((date - a["lastMessage"]) <= 500){
+        //wait for specified interval between messages, trying to limit spam
         a["notSpam"] = false;
       }else{
         a["lastMessage"] = date;
@@ -106,17 +115,7 @@ io.on('connection', function(socket){
 
     date = date.toLocaleString('en-US');
 
-    function getIndexUsingName(findThisName){
-      var indexOfObj = 0;
-      each(usersJSON, function(a){
-        if(a["name"] === findThisName){
-          indexOfObj = usersJSON.indexOf(a);
-        }
-      })
-      return indexOfObj;
-    };
-
-    if(usersJSON[getIndexUsingName(users[socket.nickname])]["notSpam"]){
+    if(usersJSON[getIndexUsingName(socket.nickname)]["notSpam"]){
       if(msg.substr(0,3) === '/w ' || msg.substr(0,2) === '/w'){
         msg = msg.substr(3);
         var firstSpace = msg.indexOf(' ');
@@ -142,6 +141,7 @@ io.on('connection', function(socket){
           callback("Please enter a message to whisper");
         }
       }else{
+        var indexOfUser = getIndexUsingName(socket.nickname);
         msg = date+" | "+socket.nickname+": "+ msg;
         io.emit('chat message', msg);
         console.log(msg);
@@ -154,9 +154,12 @@ io.on('connection', function(socket){
       return;
     }
     delete users[socket.nickname];
+    namePresent = false;
+    var toDelete = getIndexUsingName(socket.nickname);
+    usersJSON.splice(toDelete,1);
     updateUsers();
     io.emit('enterExit', "  " + socket.nickname + " has left the chat");
-		console.log("user disconnected");
+		console.log(socket.nickname+" disconnected");
 	});
 });
 
