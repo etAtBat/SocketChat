@@ -60,7 +60,7 @@ io.on('connection', function(socket){
   console.log("a user connected");
 
   function updateUsers(){
-    io.emit('usernames', Object.keys(users));
+    io.emit('usernames', usersJSON);
     //Object.keys returns an array
   };
 

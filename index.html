@@ -198,7 +198,7 @@
 	    socket.on('usernames', function(nameArr){
 	    	$('#userList').empty();
 	    	for(var i = 0; i < nameArr.length; i++){
-	    		$("#userList").append('<li class="list-group-item chatMessages">'+nameArr[i]+'</li>');
+	    		$("#userList").append('<li class="list-group-item chatMessages">'+nameArr[i]["name"]+'</li>');
 	    	};
 
 	    });
