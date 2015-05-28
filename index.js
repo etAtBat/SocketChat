@@ -22,6 +22,8 @@ var namePresent = false;
 //namePresent is false as long as the submitted username is valid, else true, to be used in name checking callback
 users[robotName] = "";
 usersJSON.push({"name":robotName});
+var spamLimit = 500;
+//spamLimit is time between messages, implemented to stop spam
 
 function getIndexUsingName(findThisName){
       var indexOfObj = -1;
@@ -104,7 +106,7 @@ io.on('connection', function(socket){
     each(usersJSON, function(a){
       if(a["lastMessage"] === undefined){
         a["lastMessage"] = date;
-      }else if((date - a["lastMessage"]) <= 500){
+      }else if((date - a["lastMessage"]) <= spamLimit){
         //wait for specified interval between messages, trying to limit spam
         a["notSpam"] = false;
       }else{
